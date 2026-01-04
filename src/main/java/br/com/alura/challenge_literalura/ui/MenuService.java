@@ -1,11 +1,11 @@
-package br.com.alura.challenge_literalura.principal;
+package br.com.alura.challenge_literalura.ui;
 
 import java.util.Scanner;
 
-public class Principal {
-    private Scanner leitura = new Scanner(System.in);
+public class MenuService {
+    private static Scanner leitura = new Scanner(System.in);
 
-    public void exibeMenu() {
+    public static void exibeMenu() {
         var opcao = -1;
         while (opcao != 0) {
             var menu = """
