@@ -55,6 +55,7 @@ A aplicação disponibiliza as seguintes opções no menu interativo:
 
 O projeto está organizado seguindo uma separação clara de responsabilidades:
 
+```
 br.com.alura.challenge_literalura
 │
 ├── application
@@ -77,7 +78,7 @@ br.com.alura.challenge_literalura
 │
 └── ui
 └── MenuService.java
-
+```
 
 ### Descrição das camadas
 
