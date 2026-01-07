@@ -6,6 +6,7 @@ import br.com.alura.challenge_literalura.repository.LivroRepository;
 import br.com.alura.challenge_literalura.service.ConsumoAPI;
 import br.com.alura.challenge_literalura.service.ConverteDados;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class MenuService {
@@ -26,10 +27,11 @@ public class MenuService {
         var opcao = -1;
         while (opcao != 0) {
             var menu = """
-                    Escolha o número de sua opção:
-                    
+                    ##############################################
+                    Informe a opção desejada:
+                    ##############################################
                     1 - Buscar livro pelo título e cadastrar
-                    2 - Listar livros registrados
+                    2 - Listar livros cadastrados
                     3 - Listar autores cadastrados
                     4 - Listar autores vivos em determinado ano
                     5 - Listar livros por idioma
@@ -43,18 +45,20 @@ public class MenuService {
 
             if (opcao == 1) {
                 buscarECadastrarLivro();
+            } else if (opcao == 2) {
+                listarLivrosCadastrados();
+                break;
             } else if (opcao == 0) {
-                System.out.println("Encerrando sistema...");
+                System.out.println("Saindo do sistema...");
                 return;
             } else {
-                System.out.println("Opção inválida!");
+                System.out.println("Opção inexistente no menu!");
             }
-
         }
     }
 
     private void buscarECadastrarLivro() {
-        System.out.println("Digite o nome do livro para busca:");
+        System.out.println("Informe o título do livro para pesquisa:");
         var nomeLivro = leitura.nextLine();
         var json = consumo.obterDados(ENDERECO + nomeLivro.replace(" ", "%20"));
         var dados = conversor.obterDados(json, DadosGutendex.class);
@@ -69,17 +73,6 @@ public class MenuService {
             Autor autor = autorRepository.findByNome(dadosAutor.nome())
                     .orElseGet(() -> autorRepository.save(new Autor(dadosAutor)));
 
-//            // Salva o livro
-//            Livro livro = new Livro(dadosLivro, autor);
-//
-//            // Verifica duplicidade de livro antes de salvar
-//            try {
-//                livroRepository.save(livro);
-//                System.out.println("Livro salvo: " + livro);
-//            } catch (Exception e) {
-//                System.out.println("Erro ao salvar (possível duplicidade): " + e.getMessage());
-//            }
-
             // Verifica se já existe livro com mesmo título e autor
             if (livroRepository.existsByTituloAndAutor(dadosLivro.titulo(), autor)) {
                 System.out.println("Livro já cadastrado para este autor.");
@@ -91,9 +84,28 @@ public class MenuService {
             livroRepository.save(livro);
             System.out.println("Livro salvo: " + livro);
 
-
         } else {
             System.out.println("Livro não encontrado.");
         }
     }
+
+    private void listarLivrosCadastrados() {
+        List<Livro> livros = livroRepository.findAll();
+
+        if (livros.isEmpty()) {
+            System.out.println("Nenhum livro registrado até o momento.");
+            return;
+        }
+
+        System.out.println("\nLivros cadastrados no sistema:\n");
+
+        livros.forEach(livro -> {
+            System.out.println("Título: " + livro.getTitulo());
+            System.out.println("Autor: " + livro.getAutor().getNome());
+            System.out.println("Idioma: " + livro.getIdioma());
+            System.out.println("Downloads: " + livro.getNumeroDownloads());
+            System.out.println("-----------------------------------");
+        });
+    }
+
 }
