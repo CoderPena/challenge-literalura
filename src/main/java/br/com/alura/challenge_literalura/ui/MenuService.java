@@ -69,16 +69,28 @@ public class MenuService {
             Autor autor = autorRepository.findByNome(dadosAutor.nome())
                     .orElseGet(() -> autorRepository.save(new Autor(dadosAutor)));
 
+//            // Salva o livro
+//            Livro livro = new Livro(dadosLivro, autor);
+//
+//            // Verifica duplicidade de livro antes de salvar
+//            try {
+//                livroRepository.save(livro);
+//                System.out.println("Livro salvo: " + livro);
+//            } catch (Exception e) {
+//                System.out.println("Erro ao salvar (possível duplicidade): " + e.getMessage());
+//            }
+
+            // Verifica se já existe livro com mesmo título e autor
+            if (livroRepository.existsByTituloAndAutor(dadosLivro.titulo(), autor)) {
+                System.out.println("Livro já cadastrado para este autor.");
+                return;
+            }
+
             // Salva o livro
             Livro livro = new Livro(dadosLivro, autor);
+            livroRepository.save(livro);
+            System.out.println("Livro salvo: " + livro);
 
-            // Verifica duplicidade de livro antes de salvar
-            try {
-                livroRepository.save(livro);
-                System.out.println("Livro salvo: " + livro);
-            } catch (Exception e) {
-                System.out.println("Erro ao salvar (possível duplicidade): " + e.getMessage());
-            }
 
         } else {
             System.out.println("Livro não encontrado.");

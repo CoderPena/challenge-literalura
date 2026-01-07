@@ -1,5 +1,6 @@
 package br.com.alura.challenge_literalura.repository;
 
+import br.com.alura.challenge_literalura.model.Autor;
 import br.com.alura.challenge_literalura.model.Livro;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,5 +12,6 @@ public interface LivroRepository extends JpaRepository<Livro, Long> {
 
     Optional<Livro> findByTituloAndAutor(String titulo, String autor);
 
-    boolean existsByTituloAndAutor(String titulo, String autor);
+    boolean existsByTituloAndAutor(String titulo, Autor autor);
+
 }
