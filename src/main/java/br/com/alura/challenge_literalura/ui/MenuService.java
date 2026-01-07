@@ -36,7 +36,7 @@ public class MenuService {
                     4 - Listar autores vivos em determinado ano
                     5 - Listar livros por idioma
                     
-                    0 - Sair                    
+                    0 - Sair
                     
                     """;
             System.out.println(menu);
@@ -47,10 +47,15 @@ public class MenuService {
                 buscarECadastrarLivro();
             } else if (opcao == 2) {
                 listarLivrosCadastrados();
-                break;
+            } else if (opcao == 3) {
+                listarAutoresCadastrados();
+            } else if (opcao == 4) {
+                listarAutoresVivosEmDeterminadoAno();
+            } else if (opcao == 5) {
+                listarLivrosPorIdioma();
             } else if (opcao == 0) {
                 System.out.println("Saindo do sistema...");
-                return;
+                break;
             } else {
                 System.out.println("Opção inexistente no menu!");
             }
@@ -107,5 +112,105 @@ public class MenuService {
             System.out.println("-----------------------------------");
         });
     }
+
+    private void listarAutoresCadastrados() {
+        List<Autor> autores = autorRepository.findAll();
+
+        if (autores.isEmpty()) {
+            System.out.println("Nenhum autor registrado no sistema.");
+            return;
+        }
+
+        System.out.println("\nAutores cadastrados:\n");
+
+        autores.forEach(autor -> {
+            System.out.println("Nome: " + autor.getNome());
+            System.out.println("Ano de nascimento: " + autor.getAnoNascimento());
+
+            if (autor.getAnoFalecimento() != null) {
+                System.out.println("Ano de falecimento: " + autor.getAnoFalecimento());
+            } else {
+                System.out.println("Autor ainda vivo.");
+            }
+
+            System.out.println("-----------------------------------");
+        });
+    }
+
+    private void listarAutoresVivosEmDeterminadoAno() {
+        System.out.print("Informe o ano para consulta: ");
+        int anoConsulta = leitura.nextInt();
+        leitura.nextLine();
+
+        List<Autor> autores = autorRepository.findAll();
+
+        List<Autor> autoresVivos = autores.stream()
+                .filter(autor ->
+                        autor.getAnoNascimento() != null &&
+                                autor.getAnoNascimento() <= anoConsulta &&
+                                (autor.getAnoFalecimento() == null ||
+                                        autor.getAnoFalecimento() > anoConsulta)
+                )
+                .toList();
+
+        if (autoresVivos.isEmpty()) {
+            System.out.println("Nenhum autor vivo encontrado para o ano informado.");
+            return;
+        }
+
+        System.out.println("\nAutores vivos no ano " + anoConsulta + ":\n");
+
+        autoresVivos.forEach(autor -> {
+            System.out.println("Nome: " + autor.getNome());
+            System.out.println("Ano de nascimento: " + autor.getAnoNascimento());
+
+            if (autor.getAnoFalecimento() != null) {
+                System.out.println("Ano de falecimento: " + autor.getAnoFalecimento());
+            } else {
+                System.out.println("Autor ainda vivo.");
+            }
+
+            System.out.println("-----------------------------------");
+        });
+    }
+
+    private void listarLivrosPorIdioma() {
+        System.out.print("Informe o idioma para consulta (pt, en, es, fr): ");
+        String entrada = leitura.nextLine().trim();
+
+        Idioma idioma;
+        try {
+            idioma = Idioma.fromCodigoApi(entrada);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Idioma inválido. Utilize pt, en, es ou fr.");
+            return;
+        }
+
+        List<Livro> livros = livroRepository.findAll();
+
+        List<Livro> livrosPorIdioma = livros.stream()
+                .filter(livro ->
+                        livro.getIdioma() != null &&
+                                livro.getIdioma() == idioma
+                )
+                .toList();
+
+        if (livrosPorIdioma.isEmpty()) {
+            System.out.println("Nenhum livro encontrado para o idioma: " + idioma);
+            return;
+        }
+
+        System.out.println(
+                "\nLivros cadastrados em " + idioma.getDescricao() + ":\n"
+        );
+
+        livrosPorIdioma.forEach(livro -> {
+            System.out.println("Título: " + livro.getTitulo());
+            System.out.println("Autor: " + livro.getAutor().getNome());
+            System.out.println("Downloads: " + livro.getNumeroDownloads());
+            System.out.println("-----------------------------------");
+        });
+    }
+
 
 }
