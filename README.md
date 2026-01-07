@@ -1,198 +1,137 @@
-# LiterAlura – Catálogo de Livros (CLI)
+# Challenge Literalura
 
-Aplicação back-end desenvolvida em **Java com Spring Boot**, executada em modo **Command Line Interface (CLI)**, que consome a API pública **Gutendex** para criar e gerenciar um catálogo de livros persistido em banco de dados relacional.
+## Visão Geral
 
-O projeto tem como objetivo consolidar conceitos fundamentais de desenvolvimento back-end, como consumo de APIs REST, persistência de dados com JPA e organização de aplicações Spring.
+O **Challenge Literalura** é um projeto Java com Spring Boot desenvolvido como parte do desafio da Alura, cujo objetivo é consumir a API pública **Gutendex** (Projeto Gutenberg), persistir dados de livros e autores em um banco de dados relacional e permitir consultas via um menu interativo no terminal.
 
----
-
-## Visão Geral do Projeto
-
-O LiterAlura permite ao usuário consultar livros disponíveis na API Gutendex e armazená-los localmente em um banco de dados PostgreSQL, possibilitando consultas posteriores sem a necessidade de novas requisições externas.
-
-A interação com o sistema ocorre exclusivamente via terminal, por meio de um menu textual.
+O sistema trabalha exclusivamente com **livros de domínio público**, organizando informações como título, autor, idioma e número de downloads.
 
 ---
 
 ## Funcionalidades
 
-A aplicação disponibiliza as seguintes opções no menu interativo:
+A aplicação disponibiliza um menu interativo em linha de comando com as seguintes opções:
 
-### 1. Buscar livro pelo título
-- Consome a API Gutendex
-- Extrai título, autor, idioma e número de downloads
-- Persiste os dados no banco de dados
+1. Buscar livro pelo título e cadastrá-lo no banco de dados
+2. Listar livros cadastrados
+3. Listar autores cadastrados
+4. Listar autores vivos em determinado ano
+5. Listar livros por idioma
+0. Sair da aplicação
 
-### 2. Listar livros registrados
-- Consulta apenas o banco de dados local
-- Exibe todos os livros previamente cadastrados
-
-### 3. Listar autores cadastrados
-- Exibe:
-  - Nome do autor
-  - Ano de nascimento
-  - Ano de falecimento
-  - Livros associados
-
-### 4. Listar autores vivos em determinado ano
-- Realiza consulta baseada em critério temporal
-- Retorna autores que estavam vivos no ano informado
-
-### 5. Listar livros por idioma
-- Permite filtrar livros por idioma
-- Idiomas suportados:
-  - Português (`pt`)
-  - Inglês (`en`)
-  - Espanhol (`es`)
-  - Francês (`fr`)
-
-### 0. Sair
-- Finaliza a execução da aplicação
+Durante a busca, os dados são obtidos da API Gutendex, convertidos para objetos Java e persistidos utilizando JPA.
 
 ---
-## Estrutura do Projeto
 
+## Arquitetura do Projeto
 
-O projeto está organizado seguindo uma separação clara de responsabilidades:
+O projeto segue uma organização em camadas, respeitando boas práticas de separação de responsabilidades:
 
 ```
-br.com.alura.challenge_literalura
+src/main/java/br/com/alura/challenge_literalura
 │
-├── application
-│ └── ChallengeLiteraluraApplication.java
-│
-├── model
-│ ├── Livro.java
-│ └── Autor.java
-│
-├── repository
-│ ├── LivroRepository.java
-│ └── AutorRepository.java
-│
-├── service
-│ ├── LivroService.java
-│ └── AutorService.java
-│
-├── client
-│ └── GutendexClient.java
-│
-└── ui
-└── MenuService.java
+├── model        # Entidades JPA e DTOs
+├── repository   # Repositórios Spring Data JPA
+├── service      # Consumo de API externa e conversão de dados
+├── ui           # Menu e interação com o usuário (CLI)
+└── ChallengeLiteraluraApplication.java
 ```
 
-### Descrição das camadas
+### Camadas principais
 
-- **application**: classe principal do Spring Boot e ponto de entrada da aplicação CLI  
-- **ui**: camada de interação com o usuário (menu no terminal)  
-- **service**: regras de negócio e orquestração das operações  
-- **client**: comunicação com a API externa Gutendex  
-- **repository**: acesso ao banco de dados via Spring Data JPA  
-- **model**: entidades JPA do domínio da aplicação  
+* **model**: Contém as entidades `Livro` e `Autor`, além de classes auxiliares para mapeamento dos dados retornados pela API.
+* **repository**: Interfaces JPA responsáveis pelo acesso ao banco de dados.
+* **service**: Responsável pelo consumo da API Gutendex e conversão de JSON para objetos Java.
+* **ui**: Implementa o menu interativo e orquestra as chamadas entre serviços e repositórios.
 
 ---
 
 ## Tecnologias Utilizadas
 
-- Java  
-- Spring Boot  
-- Spring Data JPA  
-- Maven  
-- PostgreSQL  
-- API Gutendex  
-
----
-
-## Arquitetura e Execução
-
-- Aplicação Spring Boot executada em modo **CLI**
-- Inicialização da lógica principal via `CommandLineRunner`
-- Menu textual encapsulado na classe `MenuService`
-- Persistência de dados utilizando JPA e banco relacional
-- A API externa é utilizada apenas na busca inicial dos livros
+* Java 17
+* Spring Boot 4
+* Spring Data JPA
+* Maven
+* PostgreSQL
+* Jackson (JSON)
+* API Gutendex
 
 ---
 
 ## Pré-requisitos
 
-- Java 17 ou superior  
-- Maven  
-- PostgreSQL  
-- Terminal ou IDE (IntelliJ IDEA, Eclipse ou VS Code)
+Antes de executar o projeto, certifique-se de ter instalado:
+
+* Java JDK 17 ou superior
+* Maven 3.8+
+* PostgreSQL
 
 ---
 
 ## Configuração do Banco de Dados
 
-No arquivo `application.properties`, configure os parâmetros de conexão:
+Configure as propriedades de conexão com o banco PostgreSQL no arquivo `application.properties` ou `application.yml`:
 
 ```properties
-spring.datasource.url=jdbc:postgresql://${DB_HOST}/${DB_NAME}
-spring.datasource.username=${DB_USER}
-spring.datasource.password=${DB_PASSWORD}
+spring.datasource.url=jdbc:postgresql://localhost:5432/literalura
+spring.datasource.username=seu_usuario
+spring.datasource.password=sua_senha
 
 spring.jpa.hibernate.ddl-auto=update
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
-spring.main.web-application-type=none
+spring.jpa.show-sql=true
+```
+
+O schema será criado automaticamente pelo Hibernate.
 
 ---
 
+## Como Executar o Projeto
 
-## Tecnologias Utilizadas
+1. Clone o repositório:
 
-- **Java**
-- **Spring Boot**
-- **Spring Data JPA**
-- **Maven**
-- **PostgreSQL**
-- **API Gutendex**
+```bash
+git clone <url-do-repositorio>
+```
 
----
+2. Acesse o diretório do projeto:
 
-## Arquitetura e Execução
+```bash
+cd challenge-literalura
+```
 
-- Aplicação Spring Boot executada em modo **CLI**
-- Lógica principal iniciada por meio de `CommandLineRunner`
-- Persistência de dados utilizando JPA e banco relacional
-- A API externa é utilizada apenas no momento da busca inicial dos livros
+3. Compile e execute a aplicação:
 
----
+```bash
+./mvnw spring-boot:run
+```
 
-## Pré-requisitos
-
-- Java 17 ou superior
-- Maven
-- PostgreSQL
-- Terminal ou IDE (IntelliJ, Eclipse, VS Code)
+4. Utilize o menu exibido no terminal para interagir com a aplicação.
 
 ---
 
-Execução do Projeto
-Gerar o JAR
-mvn clean package
+## API Externa
 
-Executar a aplicação
-java -jar target/literalura-0.0.1-SNAPSHOT.jar
+* **Gutendex**: [https://gutendex.com/](https://gutendex.com/)
 
-API Utilizada
+A API fornece acesso a livros do Projeto Gutenberg, permitindo buscas por título, autor e idioma.
 
-Gutendex – API pública de obras literárias
-https://gutendex.com/
+---
 
-Objetivo Educacional
+## Observações Importantes
 
-Este projeto foi desenvolvido como parte de um desafio prático com foco em:
+* A aplicação evita duplicidade de livros e autores no banco de dados.
+* Apenas livros de domínio público são consumidos.
+* O projeto é orientado para execução em ambiente local e uso educacional.
 
-Consumo de APIs REST
+---
 
-Manipulação e transformação de dados
+## Autor
 
-Modelagem de entidades
+Projeto desenvolvido por **Marcelo Pena** como parte do Challenge Java + Spring Boot da Alura.
 
-Persistência em banco de dados relacional
+---
 
-Consultas com Spring Data JPA
+## Licença
 
-Organização de aplicações back-end em camadas
-
-Uso do Spring Boot em aplicações de linha de comando
+Este projeto é de uso educacional e segue as diretrizes do Projeto Gutenberg para consumo de dados públicos.
 
